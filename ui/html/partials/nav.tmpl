@@ -1,0 +1,35 @@
+func home(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+    
+    files := []string{
+        "./ui/html/base.tmpl",
+        "./ui/html/pages/home.tmpl",
+        "./ui/html/partials/nav.tmpl",
+    }
+    
+    // 添加日志，显示尝试加载的文件
+    log.Printf("Attempting to parse template files: %v", files)
+    
+    ts, err := template.ParseFiles(files...)
+    if err != nil {
+        log.Printf("Error parsing template files: %v", err)
+        http.Error(w, "Internal Server Error", 500)
+        return
+    }
+    
+    // 添加成功日志
+    log.Printf("Templates parsed successfully")
+    
+    err = ts.ExecuteTemplate(w, "base", nil)
+    if err != nil {
+        log.Printf("Error executing template: %v", err)
+        http.Error(w, "Internal Server Error", 500)
+    }
+}{{define "nav"}}
+<nav>
+<a href='/'>Home</a>
+</nav>
+{{end}}
